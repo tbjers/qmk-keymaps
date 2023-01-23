@@ -262,6 +262,6 @@
       "KC_TRNS"
     ]
   ],
-  "author": "",
-  "notes": ""
+  "author": "Torgny Bjers",
+  "notes": "MO:1 is represented as FUNC, MO:2 as CODE, and MO:3 as right CONTROL."
 }

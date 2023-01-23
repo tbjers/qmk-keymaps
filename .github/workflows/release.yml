@@ -1,0 +1,26 @@
+---
+name: Release QMK firmware
+'on':
+  push:
+    tags:
+      - 'v[0-9]+\.[0-9]+\.[0-9]+'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        id: download-artifact
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          workflow: build.yml
+          pr: ${{github.event.pull_request.number}}
+          path: dist
+          skip_unpack: true
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/*
