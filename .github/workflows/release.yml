@@ -19,8 +19,8 @@ jobs:
           path: dist
           skip_unpack: true
 
-- name: Release
-  uses: softprops/action-gh-release@v1
-  with:
-    files: |
-      dist/*
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/*
