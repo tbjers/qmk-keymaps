@@ -30,7 +30,7 @@ jobs:
           github_token: ${{secrets.GITHUB_TOKEN}}
           workflow: build.yml
           pr: ${{github.event.pull_request.number}}
-          branch: main
+          # branch: main
           path: dist
           skip_unpack: true
 
