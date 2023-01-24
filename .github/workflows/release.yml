@@ -21,7 +21,7 @@ jobs:
 
       - name: Prepare GPG key
         run: |
-          gpg_dir=.release-gpg
+          gpg_dir=~/.gnupg
           mkdir "$gpg_dir"
           keyring="$gpg_dir/secring.gpg"
           base64 -d <<< "$GPG_KEYRING_BASE64" > "$keyring"
@@ -32,9 +32,8 @@ jobs:
         env:
           GPG_KEYRING_BASE64: "${{ secrets.GPG_KEYRING_BASE64 }}"
           GPG_PASSPHRASE: "${{ secrets.GPG_PASSPHRASE }}"
-
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            dist/*
+          # - name: Release
+          #   uses: softprops/action-gh-release@v1
+          #   with:
+          #     files: |
+          #       dist/*
