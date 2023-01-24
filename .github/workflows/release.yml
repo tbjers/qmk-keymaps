@@ -2,8 +2,8 @@
 name: Release QMK firmware
 "on":
   push:
-  #   tags:
-  #     - 'v[0-9]+\.[0-9]+\.[0-9]+'
+    tags:
+      - 'v[0-9]+\.[0-9]+\.[0-9]+'
 
 jobs:
   release:
@@ -37,6 +37,7 @@ jobs:
           GPG_KEYRING_BASE64: "${{ secrets.GPG_KEYRING_BASE64 }}"
           GPG_PASSPHRASE: "${{ secrets.GPG_PASSPHRASE }}"
           GPG_OWNERTRUST: "${{ secrets.GPG_OWNERTRUST }}"
+
       - name: Generate SHA256 sums
         run: |
           hashfile=dist/sha256sum.txt
@@ -46,8 +47,8 @@ jobs:
             --sign --detach-sign $hashfile
           gpg --verify $hashfile.asc
 
-# - name: Release
-#   uses: softprops/action-gh-release@v1
-#   with:
-#     files: |
-#       dist/*
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/*
