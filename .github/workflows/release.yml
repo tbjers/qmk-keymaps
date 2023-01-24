@@ -1,0 +1,54 @@
+---
+name: Release QMK firmware
+"on":
+  push:
+    tags:
+      - 'v[0-9]+\.[0-9]+\.[0-9]+'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        id: download-artifact
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          workflow: build.yml
+          pr: ${{github.event.pull_request.number}}
+          path: dist
+          skip_unpack: true
+
+      - name: Prepare GPG key
+        run: |
+          gpg_dir=~/.gnupg
+          mkdir "$gpg_dir"
+          chmod 700 "$gpg_dir"
+          keyring="$gpg_dir/secring.gpg"
+          base64 -d <<< "$GPG_KEYRING_BASE64" > "$keyring"
+          ownertrust_file="$gpg_dir/otrust.txt"
+          echo "$GPG_OWNERTRUST" > "$ownertrust_file"
+          passphrase_file="$gpg_dir/passphrase"
+          echo "$GPG_PASSPHRASE" > "$passphrase_file"
+          gpg --import-ownertrust "$ownertrust_file"
+          echo "RELEASE_PASSPHRASE_FILE=$passphrase_file" >> "$GITHUB_ENV"
+          echo "RELEASE_KEYRING=$keyring" >> "$GITHUB_ENV"
+        env:
+          GPG_KEYRING_BASE64: "${{ secrets.GPG_KEYRING_BASE64 }}"
+          GPG_PASSPHRASE: "${{ secrets.GPG_PASSPHRASE }}"
+          GPG_OWNERTRUST: "${{ secrets.GPG_OWNERTRUST }}"
+
+      - name: Generate SHA256 sums
+        run: |
+          hashfile=dist/sha256sum.txt
+          sha256sum dist/*.zip > $hashfile
+          gpg --batch --armor --pinentry-mode=loopback \
+            --passphrase-file=$RELEASE_PASSPHRASE_FILE \
+            --sign --detach-sign $hashfile
+          gpg --verify $hashfile.asc
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/*
