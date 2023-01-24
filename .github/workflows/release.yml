@@ -39,12 +39,10 @@ jobs:
           GPG_OWNERTRUST: "${{ secrets.GPG_OWNERTRUST }}"
       - name: Generate SHA256 sums
         run: |
-          gpg_dir=~/.gnupg
-          passphrase_file="$gpg_dir/passphrase"
           hashfile=dist/sha256sum.txt
           sha256sum dist/*.zip > $hashfile
-          gpg --keyring $gpg_dir/secring.gpg --batch --armor --pinentry-mode loopback \
-            --passphrase-file=$passphrase_file --sign --detach-sign $hashfile
+          gpg --keyring=$RELEASE_KEYRING --batch --armor --pinentry-mode=loopback \
+            --passphrase-file=$RELEASE_PASSPHRASE_FILE --sign --detach-sign $hashfile
           gpg --verify $hashfile.asc
 
 # - name: Release
