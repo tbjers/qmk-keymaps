@@ -41,8 +41,9 @@ jobs:
         run: |
           hashfile=dist/sha256sum.txt
           sha256sum dist/*.zip > $hashfile
-          gpg --keyring=$RELEASE_KEYRING --batch --armor --pinentry-mode=loopback \
-            --passphrase-file=$RELEASE_PASSPHRASE_FILE --sign --detach-sign $hashfile
+          gpg --batch --armor --pinentry-mode=loopback \
+            --passphrase-file=$RELEASE_PASSPHRASE_FILE \
+            --sign --detach-sign $hashfile
           gpg --verify $hashfile.asc
 
 # - name: Release
