@@ -1,9 +1,9 @@
 ---
 name: Release QMK firmware
-'on':
+"on":
   push:
-    tags:
-      - 'v[0-9]+\.[0-9]+\.[0-9]+'
+  #   tags:
+  #     - 'v[0-9]+\.[0-9]+\.[0-9]+'
 
 jobs:
   release:
@@ -18,6 +18,20 @@ jobs:
           pr: ${{github.event.pull_request.number}}
           path: dist
           skip_unpack: true
+
+      - name: Prepare GPG key
+        run: |
+          gpg_dir=.release-gpg
+          mkdir "$gpg_dir"
+          keyring="$gpg_dir/secring.gpg"
+          base64 -d <<< "$GPG_KEYRING_BASE64" > "$keyring"
+          passphrase_file="$gpg_dir/passphrase"
+          echo "$GPG_PASSPHRASE" > "$passphrase_file"
+          echo "RELEASE_PASSPHRASE_FILE=$passphrase_file" >> "$GITHUB_ENV"
+          echo "RELEASE_KEYRING=$keyring" >> "$GITHUB_ENV"
+        env:
+          GPG_KEYRING_BASE64: "${{ secrets.GPG_KEYRING_BASE64 }}"
+          GPG_PASSPHRASE: "${{ secrets.GPG_PASSPHRASE }}"
 
       - name: Release
         uses: softprops/action-gh-release@v1
