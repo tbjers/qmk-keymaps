@@ -37,9 +37,12 @@ jobs:
           GPG_KEYRING_BASE64: "${{ secrets.GPG_KEYRING_BASE64 }}"
           GPG_PASSPHRASE: "${{ secrets.GPG_PASSPHRASE }}"
           GPG_OWNERTRUST: "${{ secrets.GPG_OWNERTRUST }}"
-      - name: Test GPG key
+      - name: Generate SHA256 sums
         run: |
-          gpg --list-secret-keys
+          hashfile=dist/sha256sum.txt
+          sha256sum dist/*.zip > $hashfile
+          gpg --sign --detach-sign --armor $hashfile
+          gpg --verify dist/$hashfile.asc
 
 # - name: Release
 #   uses: softprops/action-gh-release@v1
