@@ -7,6 +7,7 @@ name: Release QMK firmware
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - name: Download artifact
         id: download-artifact
