@@ -11,27 +11,18 @@ jobs:
       matrix:
         keymap:
           - og60
+          - planck_rev7_ortho_4x12
     steps:
-      - name: checkout qmk_firmware
-        uses: actions/checkout@v3
-        with:
-          repository: qmk/qmk_firmware
-          submodules: recursive
-
-      - name: checkout userspace
-        uses: actions/checkout@v3
-        with:
-          path: users/${{ github.actor }}
+      - name: Set up QMK build environment
+        run: qmk setup --yes --branch ${{ github.repository_owner }} ${{ github.repository_owner }}/qmk_firmware
 
       - name: build firmware
-        run: qmk compile "users/${{ github.actor }}/${{ matrix.keymap }}.json"
+        run: qmk compile "users/${{ github.repository_owner }}/${{ matrix.keymap }}.json"
 
       - name: archive firmware
         uses: actions/upload-artifact@v3
         continue-on-error: true
         with:
-          name: "${{ github.actor }}_${{ matrix.keymap }}"
-          path: |
-            *.hex
-            *.bin
-            *.uf2
+          name: "${{ github.repository_owner }}_${{ matrix.keymap }}"
+          path: "/qmk_firmware/.build/${{ matrix.keymap }}.{hex,bin,uf2}"
+          if-no-files-found: error
